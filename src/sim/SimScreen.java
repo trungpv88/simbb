@@ -16,12 +16,22 @@ public final class SimScreen extends MainScreen implements FieldChangeListener {
 	private RecordEnumeration _enum;
 	private Bitmap[] _bitmapArray = new Bitmap[4];
 	private BitmapField _bitmapField;
-	private CheckboxField checkBox1;
+	private CheckboxField checkBox1[] = new CheckboxField[10];
 	private PictureScrollField _pictureScrollField;
-	private BasicEditField _height;
 	private static final int[] colors = new int[] { Color.LIGHTBLUE,
 			Color.LIGHTSKYBLUE };
 	private VerticalFieldManager horizontalPositioning;
+	final String[] MONTHS = { "January", "February", "March", "April", "May",
+			"June", "July", "August", "September", "October", "November",
+			"December" };
+	final String[] DAYS = { "Monday", "Tuesday", "Wednesday", "Thursday",
+			"Friday", "Saturday", "Sunday" };
+	TextSpinBoxField spinBoxMonths;
+	TextSpinBoxField spinBoxDays;
+	SpinBoxFieldManager spinBoxMgr;
+	private DateField _date;
+	private BasicEditField _height;
+	private BasicEditField _weight;
 
 	/**
 	 * Creates a new SimScreen object
@@ -42,8 +52,16 @@ public final class SimScreen extends MainScreen implements FieldChangeListener {
 		// Create the centered top content
 		HorizontalFieldManager topCenteredArea = new HorizontalFieldManager(
 				USE_ALL_HEIGHT | USE_ALL_WIDTH | NO_HORIZONTAL_SCROLL);
-		horizontalPositioning = new VerticalFieldManager(
-				USE_ALL_WIDTH | NO_VERTICAL_SCROLL | Field.FIELD_VCENTER);
+		Background bg = BackgroundFactory.createBitmapBackground(Bitmap
+				.getBitmapResource("height3.png"));
+		topCenteredArea.setBackground(bg);
+		horizontalPositioning = new VerticalFieldManager(USE_ALL_WIDTH
+				| Field.FIELD_VCENTER | Manager.VERTICAL_SCROLL);
+		/*
+		Bitmap borderBitmap = Bitmap.getBitmapResource("rounded-.png");
+		horizontalPositioning.setBorder(BorderFactory.createBitmapBorder(
+				new XYEdges(12, 12, 12, 12), borderBitmap));
+				*/
 		topCenteredArea.add(horizontalPositioning);
 
 		// Initialize the bitmap array
@@ -55,14 +73,70 @@ public final class SimScreen extends MainScreen implements FieldChangeListener {
 		// Add a bitmap field to the centered top content
 		// _height = new BasicEditField("Work number: ", "", 50,
 		// BasicEditField.FILTER_PHONE);
-		loadRecords(horizontalPositioning, 0);
+
+		// loadRecords(horizontalPositioning, 0);
 
 		// _height = new TextField("Artist: ", null, 20, TextField.ANY);
-		// checkBox1 = new CheckboxField("xxx0", true);
+
 		// _bitmapField = new BitmapField(_bitmapArray[0], Field.FIELD_HCENTER);
 
 		// horizontalPositioning.add(_bitmapField);
-		// horizontalPositioning.add(checkBox1);
+
+		/*
+		 * spinBoxMonths = new TextSpinBoxField(MONTHS); spinBoxDays = new
+		 * TextSpinBoxField(DAYS); spinBoxMgr = new SpinBoxFieldManager();
+		 * spinBoxMgr.add(spinBoxDays); spinBoxMgr.add(spinBoxMonths); for (int
+		 * i = 0; i < 10; i++) { //checkBox1[i] = new CheckboxField("xxx0",
+		 * true); //horizontalPositioning.add(checkBox1[i]); }
+		 * horizontalPositioning.add(spinBoxMgr);
+		 */
+		/*
+		 * HorizontalFieldManager verticalField = new HorizontalFieldManager() {
+		 * public void sublayout(int width, int height) { Field field; int x =
+		 * 0;
+		 * 
+		 * super.sublayout(width, height); super.setExtent(width, height); for
+		 * (int i = 0; i < getFieldCount(); i++) { field = getField(i);
+		 * layoutChild(field, Display.getWidth() / 2, 10);
+		 * setPositionChild(field, x, 10); x += Display.getWidth() / 2; } } };
+		 * _date = new DateField("Date: ", Long.MIN_VALUE, DateField.DATE |
+		 * DrawStyle.LEFT); _company = new BasicEditField("Height: ", "64cm");
+		 * verticalField.add(_date); // horizontalPositioning.add(new
+		 * SeparatorField()); verticalField.add(_company);
+		 * horizontalPositioning.add(verticalField);
+		 */
+
+		_date = new DateField("Today is ", Long.MIN_VALUE, DateField.DATE
+				| DrawStyle.LEFT);
+		_height = new BasicEditField("I am ", "64 cm.");
+		_weight = new BasicEditField("I weigh ", "6kg.");
+		horizontalPositioning.add(_date);
+		horizontalPositioning.add(_height);
+		horizontalPositioning.add(_weight);
+
+		/*
+		 * HorizontalFieldManager verticalField2 = new HorizontalFieldManager()
+		 * { public void sublayout(int width, int height) { Field field; int x =
+		 * 0;
+		 * 
+		 * super.sublayout(width, height); super.setExtent(width, height); for
+		 * (int i = 0; i < getFieldCount(); i++) { field = getField(i);
+		 * layoutChild(field, Display.getWidth() / 2, 10);
+		 * setPositionChild(field, x, 30); x += Display.getWidth() / 2; } } };
+		 * _date2 = new DateField("Date: ", Long.MIN_VALUE, DateField.DATE |
+		 * DrawStyle.LEFT); _company2 = new BasicEditField("Height: ", "64cm");
+		 * verticalField2.add(_date2); // horizontalPositioning.add(new
+		 * SeparatorField()); verticalField2.add(_company2);
+		 * horizontalPositioning.add(verticalField2);
+		 */
+
+		/*
+		 * GridFieldManager gfm = new GridFieldManager(2, 2, 0); _date = new
+		 * DateField("Date: ", Long.MIN_VALUE, DateField.DATE | DrawStyle.LEFT);
+		 * _company = new BasicEditField("Height: ", "64cm"); gfm.add(_date);
+		 * gfm.add(_company); horizontalPositioning.add(gfm);
+		 */
+
 		// horizontalPositioning.add(_height);
 
 		// Initialize an array of scroll entries
@@ -133,9 +207,9 @@ public final class SimScreen extends MainScreen implements FieldChangeListener {
 		if (field == _pictureScrollField) {
 			// Set the centered bitmap to be that which is selected
 			// in the picture scroll field.
-			horizontalPositioning.deleteAll();
-			int currentIndex = _pictureScrollField.getCurrentImageIndex();
-			loadRecords(horizontalPositioning, currentIndex);
+			// horizontalPositioning.deleteAll();
+			// int currentIndex = _pictureScrollField.getCurrentImageIndex();
+			// loadRecords(horizontalPositioning, currentIndex);
 			// _bitmapField.setBitmap(_bitmapArray[currentIndex]);
 			// checkBox1.setLabel("xxx" + String.valueOf(currentIndex));
 		}
