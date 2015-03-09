@@ -69,8 +69,12 @@ public final class SimList {
 		return (SimRecord) _simRecords.elementAt(index);
 	}
 
-	synchronized void insertSimRecord(SimRecord orderRecord) {
+	synchronized void addSimRecord(SimRecord orderRecord) {
 		_simRecords.insertElementAt(orderRecord, 0);
+	}
+	
+	synchronized void insertSimRecord(SimRecord orderRecord, int pos) {
+		_simRecords.insertElementAt(orderRecord, pos);
 	}
 
 	synchronized void deleteSimRecord(SimRecord orderRecord) {
@@ -136,11 +140,6 @@ public final class SimList {
 
 	synchronized void commit() {
 		_persist.commit();
-	}
-
-	private void addSimRecord(SimRecord orderRecord) {
-		ObjectGroup.createGroup(orderRecord);
-		_simRecords.addElement(orderRecord);
 	}
 
 	final static class SortableVector extends SimpleSortingVector {

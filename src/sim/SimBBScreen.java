@@ -151,10 +151,7 @@ public final class SimBBScreen extends MainScreen implements
 		orderRecord = screen.getUpdatedOrderRecord();
 
 		if (orderRecord != null) {
-			/* outer. */_simList.replaceOrderRecordAt(_simList
-					.particularToCommonFieldIndex(
-							_pictureScrollField.getCurrentImageIndex(),
-							_simListField.getSelectedIndex()), orderRecord);
+			/* outer. */_simList.replaceOrderRecordAt(index, orderRecord);
 		}
 	}
 
@@ -265,6 +262,7 @@ public final class SimBBScreen extends MainScreen implements
 			if (getSize() > 0) {
 				int index = getSelectedIndex();
 				contextMenu.addItem(new New());
+				contextMenu.addItem(new Insert(index));
 				contextMenu.addItem(new Edit(index));
 				contextMenu.addItem(new Delete(index));
 			} else {
@@ -277,18 +275,40 @@ public final class SimBBScreen extends MainScreen implements
 
 	private final class New extends MenuItem {
 		private New() {
-			super("Add", 99, 99);
+			super("Add", 98, 98);
 		}
 
 		public void run() {
 
 			SimRecord simRecord = new SimRecord("", System.currentTimeMillis(),
 					_pictureScrollField.getCurrentImageIndex());
-			/* outer. */_simList.insertSimRecord(simRecord);
+			/* outer. */_simList.addSimRecord(simRecord);
 			/* outer. */_simListField.setSize( /* outer. */_simList
 					.getNumSimRecordsById(_pictureScrollField
 							.getCurrentImageIndex()));
 			viewRecord(0, true);
+		}
+	}
+
+	private final class Insert extends MenuItem {
+		private int _index;
+
+		private Insert(int index) {
+			super("Insert", 99, 99);
+			_index = index;
+		}
+
+		public void run() {
+
+			SimRecord simRecord = new SimRecord("", System.currentTimeMillis(),
+					_pictureScrollField.getCurrentImageIndex());
+			int pos = _simList.particularToCommonFieldIndex(
+					_pictureScrollField.getCurrentImageIndex(), _index);
+			/* outer. */_simList.insertSimRecord(simRecord, pos);
+			/* outer. */_simListField.setSize( /* outer. */_simList
+					.getNumSimRecordsById(_pictureScrollField
+							.getCurrentImageIndex()));
+			viewRecord(pos, true);
 		}
 	}
 
