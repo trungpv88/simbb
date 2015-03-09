@@ -1,3 +1,8 @@
+/**
+ * Source: 'Wire Frame Layout Demo' sample
+ * http://developer.blackberry.com/
+ */
+
 package sim;
 
 import net.rim.device.api.ui.*;

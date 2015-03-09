@@ -1,3 +1,8 @@
+/**
+ * Based on 'Memory Demo' sample
+ * http://developer.blackberry.com/
+ */
+
 package sim;
 
 import java.util.Calendar;
@@ -5,7 +10,7 @@ import java.util.Date;
 
 import net.rim.device.api.util.Persistable;
 
-public final class SimRecord implements Persistable{
+public final class SimRecord implements Persistable {
 	private long _date;
 	private String _note;
 	private int _id;
@@ -15,7 +20,7 @@ public final class SimRecord implements Persistable{
 		_date = date;
 		_id = id;
 	}
-	
+
 	public int getId() {
 		return _id;
 	}
@@ -39,6 +44,15 @@ public final class SimRecord implements Persistable{
 	public void setNote(String _height) {
 		this._note = _height;
 	}
+	
+	public String format(int number)
+	{
+		StringBuffer strNumber = new StringBuffer();
+		if (number < 10)
+			strNumber.append('0');
+		strNumber.append(number);
+		return strNumber.toString();
+	}
 
 	public String toString() {
 		Calendar calendar = Calendar.getInstance();
@@ -47,11 +61,10 @@ public final class SimRecord implements Persistable{
 		int day = calendar.get(Calendar.DAY_OF_MONTH);
 		int month = calendar.get(Calendar.MONTH) + 1;
 		int year = calendar.get(Calendar.YEAR);
-
 		StringBuffer buffer = new StringBuffer();
-
-		buffer.append(day).append('/').append(month).append('/').append(year)
-				.append(" : ").append(" ").append(_note);
+		buffer.append(format(day)).append('-').append(format(month))
+				.append('-').append(year).append(".   ").append(" ")
+				.append(_note);
 
 		return buffer.toString();
 	}

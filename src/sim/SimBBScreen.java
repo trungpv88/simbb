@@ -1,12 +1,16 @@
+/**
+ * Based on 'Wire Frame Layout Demo'
+ * and 'Memory Demo' samples 
+ * http://developer.blackberry.com/
+ */
+
 package sim;
 
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.microedition.rms.RecordEnumeration;
-import javax.microedition.rms.RecordStoreException;
-import javax.microedition.rms.RecordStoreNotOpenException;
-
+import net.rim.device.api.ui.Font;
+import net.rim.device.api.ui.FontFamily;
 import net.rim.device.api.ui.decor.*;
 import net.rim.device.api.lowmemory.LowMemoryListener;
 import net.rim.device.api.lowmemory.LowMemoryManager;
@@ -15,45 +19,16 @@ import net.rim.device.api.ui.*;
 import net.rim.device.api.ui.container.*;
 import net.rim.device.api.ui.component.*;
 import net.rim.device.api.ui.extension.component.*;
-import net.rim.device.api.ui.extension.container.EyelidFieldManager;
 
 public final class SimBBScreen extends MainScreen implements
 		FieldChangeListener, LowMemoryListener, ListFieldCallback {
 
-	private RecordEnumeration _enum;
 	private Bitmap[] _bitmapArray = new Bitmap[4];
-	private BitmapField _bitmapField;
-	private CheckboxField checkBox1[] = new CheckboxField[20];
 	private PictureScrollField _pictureScrollField;
-	private static final int[] colors = new int[] { Color.LIGHTBLUE,
-			Color.LIGHTSKYBLUE };
 	private VerticalFieldManager horizontalPositioning;
-	final String[] MONTHS = { "January", "February", "March", "April", "May",
-			"June", "July", "August", "September", "October", "November",
-			"December" };
-	final String[] DAYS = { "Monday", "Tuesday", "Wednesday", "Thursday",
-			"Friday", "Saturday", "Sunday" };
-	TextSpinBoxField spinBoxMonths;
-	TextSpinBoxField spinBoxDays[] = new TextSpinBoxField[20];
-	SpinBoxFieldManager spinBoxMgr;
-	private DateField _date;
-	private BasicEditField _height;
-	private BasicEditField _weight;
-	private DateField _date2;
-	private BasicEditField _height2;
-	private DateField _date3[] = new DateField[20];
-	private BasicEditField _height3[] = new BasicEditField[20];
-	// Members
-	// -------------------------------------------------------------------------------------
 	private SimList _simList;
 	private SimListField _simListField;
 	private UiApplication _app;
-
-	private ProgressBarDialog _progressDialog;
-
-	// Constants
-	// -----------------------------------------------------------------------------------
-	private static final int MAX_RECORDS = 1000;
 
 	/**
 	 * Creates a new SimScreen object
@@ -67,16 +42,11 @@ public final class SimBBScreen extends MainScreen implements
 		// Create the centered top content
 		HorizontalFieldManager topCenteredArea = new HorizontalFieldManager(
 				USE_ALL_HEIGHT | USE_ALL_WIDTH | NO_HORIZONTAL_SCROLL);
-		Background bg = BackgroundFactory.createBitmapBackground(Bitmap
-				.getBitmapResource("height3.png"));
-		//topCenteredArea.setBackground(bg);
 		horizontalPositioning = new VerticalFieldManager(USE_ALL_WIDTH
 				| Field.FIELD_LEFT | Manager.VERTICAL_SCROLL);
-
-		Bitmap borderBitmap = Bitmap.getBitmapResource("height3.png");
-		// horizontalPositioning.setBorder(BorderFactory.createBitmapBorder(
-		// new XYEdges(12, 12, 12, 12), borderBitmap));
-
+		Bitmap borderBitmap = Bitmap.getBitmapResource("rounded-border.png");
+		horizontalPositioning.setBorder(BorderFactory.createBitmapBorder(
+				new XYEdges(12, 12, 12, 12), borderBitmap));
 		topCenteredArea.add(horizontalPositioning);
 
 		// Initialize the bitmap array
@@ -88,13 +58,13 @@ public final class SimBBScreen extends MainScreen implements
 		// Initialize an array of scroll entries
 		PictureScrollField.ScrollEntry[] entries = new PictureScrollField.ScrollEntry[4];
 		entries[0] = new PictureScrollField.ScrollEntry(_bitmapArray[0], null,
-				"Height");
-		entries[1] = new PictureScrollField.ScrollEntry(_bitmapArray[1], null,
 				"Weight");
+		entries[1] = new PictureScrollField.ScrollEntry(_bitmapArray[1], null,
+				"Height");
 		entries[2] = new PictureScrollField.ScrollEntry(_bitmapArray[2], null,
 				"Vaccine");
 		entries[3] = new PictureScrollField.ScrollEntry(_bitmapArray[3], null,
-				"Photos");
+				"Notes");
 
 		// Initialize the picture scroll field
 		_pictureScrollField = new PictureScrollField(80, 64);
@@ -118,13 +88,11 @@ public final class SimBBScreen extends MainScreen implements
 		add(bodyManager);
 
 		_app = UiApplication.getUiApplication();
-		// Get and display the order list.
+		// Get and display the record list.
 		_simList = SimList.getInstance();
 		_simListField = new SimListField(
 				_simList.getNumSimRecordsById(_pictureScrollField
 						.getCurrentImageIndex()));
-		// _simListField = new
-		// SimListField(_simList.getNumSimRecordsById(_pictureScrollField.getCurrentImageIndex()));
 		_simListField.setCallback(this);
 		horizontalPositioning.add(_simListField);
 
@@ -133,13 +101,6 @@ public final class SimBBScreen extends MainScreen implements
 
 	public void fieldChanged(Field field, int context) {
 		if (field == _pictureScrollField) {
-			// Set the centered bitmap to be that which is selected
-			// in the picture scroll field.
-			// horizontalPositioning.deleteAll();
-			// int currentIndex = _pictureScrollField.getCurrentImageIndex();
-			// loadRecords(horizontalPositioning, currentIndex);
-			// _bitmapField.setBitmap(_bitmapArray[currentIndex]);
-			// checkBox1.setLabel("xxx" + String.valueOf(currentIndex));
 			horizontalPositioning.deleteAll();
 			_simListField = new SimListField(
 					_simList.getNumSimRecordsById(_pictureScrollField
@@ -147,34 +108,6 @@ public final class SimBBScreen extends MainScreen implements
 			_simListField.setCallback(this);
 			horizontalPositioning.add(_simListField);
 		}
-	}
-
-	protected boolean onSavePrompt() {
-		switch (Dialog.ask(Dialog.D_SAVE)) {
-		case Dialog.SAVE:
-			return onSave();
-		case Dialog.DISCARD:
-			return onDiscard();
-		case Dialog.CANCEL:
-			return onCancel();
-		default:
-			return false;
-		}
-	}
-
-	protected boolean onSave() {
-		System.out.println("Save");
-		return true;
-	}
-
-	protected boolean onDiscard() {
-		System.out.println("Discard");
-		return true;
-	}
-
-	protected boolean onCancel() {
-		System.out.println("Cancel");
-		return false;
 	}
 
 	public boolean onClose() {
@@ -218,8 +151,10 @@ public final class SimBBScreen extends MainScreen implements
 		orderRecord = screen.getUpdatedOrderRecord();
 
 		if (orderRecord != null) {
-			/* outer. */_simList.replaceOrderRecordAt(
-					_simListField.getSelectedIndex(), orderRecord);
+			/* outer. */_simList.replaceOrderRecordAt(_simList
+					.particularToCommonFieldIndex(
+							_pictureScrollField.getCurrentImageIndex(),
+							_simListField.getSelectedIndex()), orderRecord);
 		}
 	}
 
@@ -228,12 +163,42 @@ public final class SimBBScreen extends MainScreen implements
 		int currentId = _pictureScrollField.getCurrentImageIndex();
 		Object object = get(listField,
 				_simList.particularToCommonFieldIndex(currentId, index));
-		// if (currentIndex == 0)
-		// object = get(listField, 1);
-		// else if (currentIndex == 1)
-		// object = get(listField, 0);
+		int paddingLeft = 50;
+		int paddingTop = 4;
+		int paddingRight = 10;
+		int lineHeight = 25;
+		int dateTimeWidth = 100;
+		int fontSize = 20;
 		if (((SimRecord) object).getId() == currentId) {
-			graphics.drawText(object.toString(), 50, y, 0, width);
+			try {
+				FontFamily fontFamily = FontFamily.forName("BBJapanese");
+				Font font = fontFamily.getFont(Font.PLAIN, fontSize);
+				graphics.setFont(font);
+
+				graphics.setColor(Color.RED);
+				String recordString = object.toString();
+				String dateTimeString = recordString.substring(0, 11);
+				graphics.drawText(dateTimeString, paddingLeft, y + paddingTop,
+						0, width);
+
+				graphics.setColor(Color.BLACK);
+				String noteString = recordString.substring(12,
+						recordString.length());
+				graphics.drawText(noteString, paddingLeft + dateTimeWidth, y
+						+ paddingTop, 0, width);
+
+				graphics.setColor(Color.BURLYWOOD);
+				graphics.drawLine(paddingLeft, y + lineHeight, width
+						- paddingRight, y + lineHeight);
+
+				Bitmap bitmap = Bitmap.getBitmapResource("xp.png");
+				graphics.drawBitmap(paddingTop, y + paddingTop,
+						bitmap.getWidth(), bitmap.getHeight(), bitmap, 0, 0);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 	}
 
@@ -336,8 +301,10 @@ public final class SimBBScreen extends MainScreen implements
 		}
 
 		public void run() {
-			viewRecord(_simList.particularToCommonFieldIndex(
-					_pictureScrollField.getCurrentImageIndex(), _index), true);
+			viewRecord(
+					_simList.particularToCommonFieldIndex(
+							_pictureScrollField.getCurrentImageIndex(), _index),
+					true);
 		}
 	}
 
@@ -363,78 +330,4 @@ public final class SimBBScreen extends MainScreen implements
 			}
 		}
 	}
-
-	static class ProgressBarDialog implements CountAndSortListener {
-		private DialogFieldManager _manager;
-		private PopupScreen _popupScreen;
-		private GaugeField _gaugeField;
-		private LabelField _lbfield;
-
-		private int _max;
-		private int _stepSize;
-
-		private ProgressBarDialog(String title, int max) {
-			_max = max; // Number of records to be added.
-
-			// Make sure that step size is at least one.
-			_stepSize = Math.max(_max / 100, 1);
-
-			_manager = new DialogFieldManager();
-			_popupScreen = new PopupScreen(_manager);
-			_gaugeField = new GaugeField(null, 0, max, 0, GaugeField.PERCENT);
-			_lbfield = new LabelField(title, Field.USE_ALL_WIDTH);
-
-			_manager.addCustomField(_lbfield);
-			_manager.addCustomField(_gaugeField);
-
-			UiApplication.getUiApplication().pushScreen(_popupScreen);
-		}
-
-		public void counterUpdated(int counter) {
-			if (counter % _stepSize == 0) {
-				_gaugeField.setValue(counter + 1);
-			}
-		}
-
-		public void sortingStarted() {
-			// Remove _gaugeField and change the text displayed on _popupScreen
-			// to
-			// "Sorting records..." .
-			UiApplication.getUiApplication().invokeLater(new Runnable() {
-				public void run() {
-					_manager.deleteCustomField(_gaugeField);
-					_lbfield.setText("Sorting records...");
-				}
-			});
-		}
-
-		public void sortingFinished() {
-			// Remove _popupScreen from the stack.
-			UiApplication.getUiApplication().invokeLater(new Runnable() {
-				public void run() {
-					UiApplication.getUiApplication().popScreen(_popupScreen);
-				}
-			});
-		}
-	}
-}
-
-interface CountAndSortListener {
-	/**
-	 * Called when the counter is updated
-	 * 
-	 * @param counter
-	 *            The new counter
-	 */
-	public void counterUpdated(int counter);
-
-	/**
-	 * Called when sorting is started
-	 */
-	public void sortingStarted();
-
-	/**
-	 * Called when sorting is finished
-	 */
-	public void sortingFinished();
 }

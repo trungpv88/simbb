@@ -1,3 +1,8 @@
+/**
+ * This application based on 'Wire Frame Layout Demo'
+ * and 'Memory Demo' samples (http://developer.blackberry.com/)
+ */
+
 package sim;
 
 import net.rim.device.api.ui.UiApplication;

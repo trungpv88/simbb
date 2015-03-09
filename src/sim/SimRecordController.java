@@ -1,3 +1,8 @@
+/**
+ * Based on 'Memory Demo' sample
+ * http://developer.blackberry.com/
+ */
+
 package sim;
 
 import java.util.Vector;
@@ -7,7 +12,6 @@ import net.rim.device.api.ui.component.BasicEditField;
 import net.rim.device.api.ui.component.DateField;
 
 public final class SimRecordController {
-	// Members -------------------------------------------------------------------------------------
     private boolean _editable;
     private SimRecord _simRecord;
     private DateField _date;
@@ -24,7 +28,6 @@ public final class SimRecordController {
         } 
         else 
         {
-            // Record is not editable, so just use the grouped object.
             _simRecord = simRecord;
         }
         
@@ -64,7 +67,6 @@ public final class SimRecordController {
         {
             _editable = true;
             
-            // Make an ungrouped copy of the order record, which can then be edited.
             _simRecord = (SimRecord) ObjectGroup.expandGroup( _simRecord );
             
             setFieldsEditable( true );
