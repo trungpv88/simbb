@@ -51,7 +51,32 @@ public final class SimList {
 				nbRecord++;
 		}
         return nbRecord;
-    }    
+    }
+    
+	public int particularToCommonFieldIndex(int fieldId, int particularFieldIndex)
+	{
+		int commonFieldIndex = 0;
+		for (int i = 0; i < _simRecords.size(); i++) {
+			if ((( SimRecord )_simRecords.elementAt( i )).getId() == fieldId)
+				particularFieldIndex --;
+			if (-1 == particularFieldIndex)
+			{
+				commonFieldIndex = i;
+				break;
+			}
+		}
+		return commonFieldIndex;
+	}
+	
+	public int commonToParticularFieldIndex(int fieldId, int commonFieldIndex)
+	{
+		int particularFieldIndex = -1;
+		for (int i = 0; i < commonFieldIndex + 1; i++) {
+			if ((( SimRecord )_simRecords.elementAt( i )).getId() == fieldId)
+				particularFieldIndex++;
+		}
+		return particularFieldIndex;
+	}
     
     SimRecord getSimRecordAt( int index) 
     {

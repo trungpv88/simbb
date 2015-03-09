@@ -69,7 +69,7 @@ public final class SimBBScreen extends MainScreen implements
 				USE_ALL_HEIGHT | USE_ALL_WIDTH | NO_HORIZONTAL_SCROLL);
 		Background bg = BackgroundFactory.createBitmapBackground(Bitmap
 				.getBitmapResource("height3.png"));
-		topCenteredArea.setBackground(bg);
+		//topCenteredArea.setBackground(bg);
 		horizontalPositioning = new VerticalFieldManager(USE_ALL_WIDTH
 				| Field.FIELD_LEFT | Manager.VERTICAL_SCROLL);
 
@@ -116,13 +116,15 @@ public final class SimBBScreen extends MainScreen implements
 
 		// Add the justified manager to the screen
 		add(bodyManager);
-		
 
 		_app = UiApplication.getUiApplication();
 		// Get and display the order list.
 		_simList = SimList.getInstance();
-		_simListField = new SimListField(_simList.getNumSimRecords());
-		//_simListField = new SimListField(_simList.getNumSimRecordsById(_pictureScrollField.getCurrentImageIndex()));
+		_simListField = new SimListField(
+				_simList.getNumSimRecordsById(_pictureScrollField
+						.getCurrentImageIndex()));
+		// _simListField = new
+		// SimListField(_simList.getNumSimRecordsById(_pictureScrollField.getCurrentImageIndex()));
 		_simListField.setCallback(this);
 		horizontalPositioning.add(_simListField);
 
@@ -138,10 +140,12 @@ public final class SimBBScreen extends MainScreen implements
 			// loadRecords(horizontalPositioning, currentIndex);
 			// _bitmapField.setBitmap(_bitmapArray[currentIndex]);
 			// checkBox1.setLabel("xxx" + String.valueOf(currentIndex));
-			//horizontalPositioning.deleteAll();
-			//_simListField = new SimListField(_simList.getNumSimRecordsById(_pictureScrollField.getCurrentImageIndex()));
-			//_simListField.setCallback(this);
-			//horizontalPositioning.add(_simListField);
+			horizontalPositioning.deleteAll();
+			_simListField = new SimListField(
+					_simList.getNumSimRecordsById(_pictureScrollField
+							.getCurrentImageIndex()));
+			_simListField.setCallback(this);
+			horizontalPositioning.add(_simListField);
 		}
 	}
 
@@ -183,7 +187,11 @@ public final class SimBBScreen extends MainScreen implements
 	protected boolean invokeAction(int action) {
 		switch (action) {
 		case ACTION_INVOKE: // Trackball click.
-			viewRecord(_simListField.getSelectedIndex());
+			if (_simList.getNumSimRecordsById(_pictureScrollField
+					.getCurrentImageIndex()) > 0)
+				viewRecord(_simList.particularToCommonFieldIndex(
+						_pictureScrollField.getCurrentImageIndex(),
+						_simListField.getSelectedIndex()), false);
 			return true; // We've consumed the event.
 		}
 		return super.invokeAction(action);
@@ -191,17 +199,21 @@ public final class SimBBScreen extends MainScreen implements
 
 	protected boolean keyChar(char key, int status, int time) {
 		if (key == Characters.ENTER) {
-			viewRecord(_simListField.getSelectedIndex());
+			if (_simList.getNumSimRecordsById(_pictureScrollField
+					.getCurrentImageIndex()) > 0)
+				viewRecord(_simList.particularToCommonFieldIndex(
+						_pictureScrollField.getCurrentImageIndex(),
+						_simListField.getSelectedIndex()), false);
 			return true;
 		}
 
 		return super.keyChar(key, status, time);
 	}
 
-	private void viewRecord(int index) {
+	private void viewRecord(int index, boolean editable) {
 		SimRecord orderRecord = (SimRecord) /* outer. */get(_simListField,
 				index);
-		NoteScreen screen = new NoteScreen(orderRecord, false);
+		NoteScreen screen = new NoteScreen(orderRecord, editable);
 		/* outer. */_app.pushModalScreen(screen);
 		orderRecord = screen.getUpdatedOrderRecord();
 
@@ -213,12 +225,16 @@ public final class SimBBScreen extends MainScreen implements
 
 	public void drawListRow(ListField listField, Graphics graphics, int index,
 			int y, int width) {
-		System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-		System.out.println(index);
-		System.out.println(y);
-		Object object = get(listField, index);
-		if (((SimRecord) object).getId() == _pictureScrollField.getCurrentImageIndex())
-			graphics.drawText(object.toString(), 0, y, 0, width);
+		int currentId = _pictureScrollField.getCurrentImageIndex();
+		Object object = get(listField,
+				_simList.particularToCommonFieldIndex(currentId, index));
+		// if (currentIndex == 0)
+		// object = get(listField, 1);
+		// else if (currentIndex == 1)
+		// object = get(listField, 0);
+		if (((SimRecord) object).getId() == currentId) {
+			graphics.drawText(object.toString(), 50, y, 0, width);
+		}
 	}
 
 	public int getPreferredWidth(ListField listField) {
@@ -305,8 +321,9 @@ public final class SimBBScreen extends MainScreen implements
 					_pictureScrollField.getCurrentImageIndex());
 			/* outer. */_simList.insertSimRecord(simRecord);
 			/* outer. */_simListField.setSize( /* outer. */_simList
-					.getNumSimRecords());
-			viewRecord(0);
+					.getNumSimRecordsById(_pictureScrollField
+							.getCurrentImageIndex()));
+			viewRecord(0, true);
 		}
 	}
 
@@ -319,7 +336,8 @@ public final class SimBBScreen extends MainScreen implements
 		}
 
 		public void run() {
-			viewRecord(_index);
+			viewRecord(_simList.particularToCommonFieldIndex(
+					_pictureScrollField.getCurrentImageIndex(), _index), true);
 		}
 	}
 
@@ -335,10 +353,13 @@ public final class SimBBScreen extends MainScreen implements
 			if (Dialog.ask(Dialog.D_DELETE) == Dialog.DELETE) {
 
 				SimRecord orderRecord = (SimRecord) /* outer. */get(
-						_simListField, _index);
+						_simListField, _simList.particularToCommonFieldIndex(
+								_pictureScrollField.getCurrentImageIndex(),
+								_index));
 				/* outer. */_simList.deleteSimRecord(orderRecord);
 				/* outer. */_simListField.setSize( /* outer. */_simList
-						.getNumSimRecords());
+						.getNumSimRecordsById(_pictureScrollField
+								.getCurrentImageIndex()));
 			}
 		}
 	}

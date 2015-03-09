@@ -101,7 +101,7 @@ public final class NoteScreen extends MainScreen {
     
     private void makeEditScreen() 
     {
-        setTitle( new LabelField( "Edit Order Record") );
+        setTitle( new LabelField( "Edit Sim Record") );
         _editable = true;
         _controller.makeEditable();
     }
